@@ -56,10 +56,11 @@ class Driver {
     // создайте метод drive, принимающий в качестве аргумента экземпляр класса Vehicle
     // в зависимости от переданного класса, вызовите методы этого класса
     void drive(Vehicle vehicle){
-        if(vehicle.getClass().equals(Car.class)){
-            vehicle.drive();
-        } else if (vehicle.getClass().equals(DriftCar.class)){
-            ((DriftCar) vehicle).drift();
+        if(vehicle instanceof Car){
+            if (vehicle instanceof DriftCar)
+                ((DriftCar) vehicle).drift();
+            else
+                vehicle.drive();
         } else if (vehicle instanceof Bike){
             ((Bike) vehicle).rideOnBackWheel();
         } else {
