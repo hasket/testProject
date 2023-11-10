@@ -13,12 +13,11 @@ class Article {
 
 // создайте интерфейс Subscriber
 
-interface Subscriber{
+interface Subscriber {
     // интерфейс должен иметь всего один метод `void send()`, который принимает на вход объект класса `Article`
     void send(final Article article);
 
 }
-
 
 
 class OfflineSubscriber implements Subscriber /* класс должен реализовывать интерфейс Subscriber */ {
@@ -30,7 +29,7 @@ class OfflineSubscriber implements Subscriber /* класс должен реа�
     }
 
     // метод send интерфейса Subscriber должен выводить текст "{article.getArticle} была доставлена по адресу: {address}"
-    public void send(final Article article){
+    public void send(final Article article) {
         System.out.println(article.getArticle + " была доставлена по адресу: " + address);
     }
 
@@ -45,7 +44,7 @@ class WebSite implements Subscriber/* класс должен реализовы
     }
 
     // метод send интерфейса Subscriber должен выводить текст "{article.getArticle} опубликована на страничке: {address}"
-    public void send(final Article article){
+    public void send(final Article article) {
         System.out.println(article.getArticle + " опубликована на страничке: " + url);
     }
 }
@@ -64,7 +63,7 @@ class NewspaperPublisher {
     }
 
     // Создайте метод subscribe() принимающий на вход любой объект, реализующий интерфейс Subscriber.
-    public void subscribe(final Subscriber subscriber){
+    public void subscribe(final Subscriber subscriber) {
         // В списке подписчиков не должно быть дубликатов! Вы можете проеверить, есть ли данный подписчик в списке методом List.contains().
         if (!subscribers.contains(subscriber))
             // При вызове метода subscribe() новый подписчик должен добавляться в список подписчиков.
@@ -72,7 +71,7 @@ class NewspaperPublisher {
     }
 
     // Создайте метод unsubscribe() принимающий на вход любой объект, реализующий интерфейс Subscriber.
-    public void unsubscribe(final Subscriber subscriber){
+    public void unsubscribe(final Subscriber subscriber) {
         // При вызове данного метода подписчик должен удаляться из списка подписчиков.
         subscribers.remove(subscriber);
     }
@@ -80,19 +79,20 @@ class NewspaperPublisher {
     // Создайте метод startWork().
     public void startWork() {
         // Метод должен отправлять все статьи, которые хранятся в данный момент в списке articles, всем подписчикам из списка.
-        for (Article article : articles){
-            // Для отправки используйте метод send() класса Subscriber.
-            for (Subscriber subscriber : subscribers){
+        for (Subscriber subscriber : subscribers) {
+            for (Article article : articles) {
+                // Для отправки используйте метод send() класса Subscriber.
+
                 subscriber.send(article);
             }
         }
     }
 
     // Создайте метод publishNewArticle(). Метод принимает на вход объект класса Article.
-    public void publishNewArticle(final Article article){
+    public void publishNewArticle(final Article article) {
         // Метод должен добавлять новую статью в список статей articles, а затем рассылать её всем подписчикам из списка.
         articles.add(article);
-        for (Subscriber subscriber : subscribers){
+        for (Subscriber subscriber : subscribers) {
             subscriber.send(article);
         }
 
