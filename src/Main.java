@@ -1,138 +1,99 @@
-class BankAccount {
+import java.util.ArrayList;
+import java.util.List;
 
-    protected int amount;
-    protected String currency;
+class Article {
 
-    public void replenishBalance(int amount) {
-        this.amount += amount;
-        System.out.println("Счет пополнен на " + amount + " " + currency);
-    }
+    final String getArticle;
 
-    public void withdrawCash(int amount) {
-    }
-
-    public void showBalance() {
+    Article(final String getArticle) {
+        this.getArticle = getArticle;
     }
 }
 
-class DebitAccount extends BankAccount {
 
-    public DebitAccount(int amount, String currency) {
-        if (amount < 0) {
-            System.out.println("Баланс дебетового счета не может быть меньше 0");
-        } else {
-            this.amount = amount;
-            this.currency = currency;
-        }
+// создайте интерфейс Subscriber
+
+interface Subscriber{
+    // интерфейс должен иметь всего один метод `void send()`, который принимает на вход объект класса `Article`
+    void send(final Article article);
+
+}
+
+
+
+class OfflineSubscriber implements Subscriber /* класс должен реализовывать интерфейс Subscriber */ {
+
+    private final String address;
+
+    public OfflineSubscriber(final String address) {
+        this.address = address;
     }
 
-    @Override
-    public void withdrawCash(int amount) {
-        if (amount > this.amount) {
-            System.out.println("У вас недостаточно средств для снятия суммы " + amount + " " + currency);
-        } else {
-            this.amount -= amount;
-            System.out.println("Вы сняли " + amount + " " + currency);
-        }
+    // метод send интерфейса Subscriber должен выводить текст "{article.getArticle} была доставлена по адресу: {address}"
+    public void send(final Article article){
+        System.out.println(article.getArticle + " была доставлена по адресу: " + address);
     }
 
-    @Override
-    public void showBalance() {
-        System.out.println("На вашем счету осталось " + amount + " " + currency);
+}
+
+class WebSite implements Subscriber/* класс должен реализовывать интерфейс Subscriber */ {
+
+    private final String url;
+
+    public WebSite(final String url) {
+        this.url = url;
+    }
+
+    // метод send интерфейса Subscriber должен выводить текст "{article.getArticle} опубликована на страничке: {address}"
+    public void send(final Article article){
+        System.out.println(article.getArticle + " опубликована на страничке: " + url);
     }
 }
 
-class CreditAccount extends BankAccount {
+class NewspaperPublisher {
+    private final List<Article> articles;
 
-    public int creditLimit;
+    // для отправки статей подписчикам, вам необходимо хранить их в списке
+    // создайте пустой список подписчиков List<Subscriber>
 
-    public CreditAccount(int amount, String currency, int creditLimit) {
-        this.amount = amount;
-        this.currency = currency;
-        this.creditLimit = creditLimit;
+    private final List<Subscriber> subscribers;
+
+    public NewspaperPublisher(final List<Article> articles) {
+        this.articles = articles;
+        this.subscribers = new ArrayList<>();
     }
 
-    @Override
-    public void withdrawCash(int amount) {
-        if (this.amount - amount < -creditLimit) {
-            System.out.println("У вас недостаточно средств для снятия суммы " + amount + " " + currency);
-        } else {
-            this.amount -= amount;
-            System.out.println("Вы сняли " + amount + " " + currency);
-        }
+    // Создайте метод subscribe() принимающий на вход любой объект, реализующий интерфейс Subscriber.
+    public void subscribe(final Subscriber subscriber){
+        // В списке подписчиков не должно быть дубликатов! Вы можете проеверить, есть ли данный подписчик в списке методом List.contains().
+        if (!subscribers.contains(subscriber))
+            // При вызове метода subscribe() новый подписчик должен добавляться в список подписчиков.
+            subscribers.add(subscriber);
     }
 
-    @Override
-    public void showBalance() {
-        if (amount >= 0) {
-            System.out.println("На вашем счету " + amount + " " + currency);
-        } else {
-            System.out.println("Ваша задолженность по кредитному счету составялет " + Math.abs(amount) + currency);
-        }
-    }
-}
-
-class Bank {
-
-    // создать метод createNewAccount, который принимает на вход строку с типом аккаунта и строку с создаваемой валютой
-    public BankAccount createNewAccount(String accountType, String currency) {
-        BankAccount bankAccount = new BankAccount();
-
-        switch (accountType) {
-            // если тип "debit_account"
-            case "debit_account":
-                // вывести сообщение "Ваш дебетовый счет создан"
-                System.out.println("Ваш дебетовый счет создан");
-                // создать дебетовый аккаунт в выбранной валюте и с нулевым балансом
-                BankAccount debtAcc = new DebitAccount(0, currency);
-                return debtAcc;
-            // если тип "credit_account"
-            case "credit_account":
-                // посчитать кредитный лимит в зависимости от валюты
-                int creditLimit = ((CreditAccount) bankAccount).creditLimit;
-                // вывести сообщение "Кредитный счет создан. Ваш лимит по счету {limit} {currency}"
-                System.out.println("Кредитный счет создан. Ваш лимит по счету " + creditLimit + " " + currency);
-                // создать кредитный аккаунт в выборанной валюты и с посчитанным кредитным лимитом
-                BankAccount creditAcc = new CreditAccount(bankAccount.amount, currency, creditLimit);
-                return creditAcc;
-            // иначе
-            default:
-                // вывести сообщение "Неверно указа тип создаваемого счета"
-                System.out.println("Неверно указа тип создаваемого счета");
-                // создать пустой объект BankAccount()
-                BankAccount emptyAcc = new BankAccount();
-                return emptyAcc;
-        }
+    // Создайте метод unsubscribe() принимающий на вход любой объект, реализующий интерфейс Subscriber.
+    public void unsubscribe(final Subscriber subscriber){
+        // При вызове данного метода подписчик должен удаляться из списка подписчиков.
+        subscribers.remove(subscriber);
     }
 
-    // создать метод closeAccount, который принимает на вход переменную типа BankAccount
-    public void closeAccount(BankAccount bankAccount) {
-
-        // если переданный аккаунт дебетовый
-        if (bankAccount instanceof DebitAccount) {
-            if (((DebitAccount) bankAccount).amount <= 0)
-                // если на счету нет денег вывести сообщение "Ваш дебетовый счет закрыт"
-                System.out.println("Ваш дебетовый счет закрыт");
-            else
-                // иначе вывести сообщение "Ваш дебетовый счет закрыт. Вы можете получить остаток по вашему счету в размере {amount} {currency} в отделении банка"
-                System.out.println("Ваш дебетовый счет закрыт. Вы можете получить остаток по вашему счету в размере " + ((DebitAccount) bankAccount).amount + " " + ((DebitAccount) bankAccount).currency + " в отделении банка");
-        }
-
-        // если переданный аккаунт кредитный
-        if (bankAccount instanceof CreditAccount) {
-            if (((CreditAccount) bankAccount).amount == 0) {
-                // если на счету нет денег вывести сообщение "Ваш кредитный счет закрыт"
-                System.out.println("Ваш кредитный счет закрыт");
-            } else if (((CreditAccount) bankAccount).amount > 0) {
-                // если на счету положительный баланс вывести сообщение "Ваш кредитный счет закрыт. Вы можете получить остаток по вашему счету в размере {amount} {currency} в отделении банка"
-                System.out.println("Ваш кредитный счет закрыт. Вы можете получить остаток по вашему счету в размере " + ((CreditAccount) bankAccount).amount + " " + ((CreditAccount) bankAccount).currency + " в отделении банка");
-            } else if (((CreditAccount) bankAccount).amount < 0) {
-                // если на счету отрицательный баланс вывести сообщение "Вы не можете закрыть кредитный счет потому как на нем еще есть задолженность. Ваша задолженность по счету составляет {amount} {currency}"
-                System.out.println("Вы не можете закрыть кредитный счет потому как на нем еще есть задолженность. Ваша задолженность по счету составляет " + ((CreditAccount) bankAccount).amount + " " + ((CreditAccount) bankAccount).currency);
-            } else {
-                // иначе вывести сообщение "Пока что мы не можем закрыть данный вид счета"
-                System.out.println("Пока что мы не можем закрыть данный вид счета");
+    // Создайте метод startWork().
+    public void startWork() {
+        // Метод должен отправлять все статьи, которые хранятся в данный момент в списке articles, всем подписчикам из списка.
+        for (Article article : articles){
+            // Для отправки используйте метод send() класса Subscriber.
+            for (Subscriber subscriber : subscribers){
+                subscriber.send(article);
             }
+        }
+    }
+
+    // Создайте метод publishNewArticle(). Метод принимает на вход объект класса Article.
+    public void publishNewArticle(final Article article){
+        // Метод должен добавлять новую статью в список статей articles, а затем рассылать её всем подписчикам из списка.
+        articles.add(article);
+        for (Subscriber subscriber : subscribers){
+            subscriber.send(article);
         }
 
     }
