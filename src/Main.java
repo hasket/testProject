@@ -1,150 +1,76 @@
-class BankAccount {
+import java.util.ArrayList;
 
-    protected int amount;
-    protected String currency;
+public class Main {
 
-    public void replenishBalance(int amount) {
-        this.amount += amount;
-        System.out.println("Счет пополнен на " + amount + " " + currency);
-    }
+    public static void main(String[] args) {
+        Organisation organisation = new Organisation();
 
-    public void withdrawCash(int amount) {
-    }
+        System.out.println("Список всех сотрудников:");
+        // замените создание анонимного класса на лямбда-функцию
+        EmployeeFilter organizationPrint = (Employee e) -> true;
 
-    public void showBalance() {
-    }
-}
+        organisation.printEmployees(organizationPrint);
 
-class DebitAccount extends BankAccount {
+        EmployeeFilter organisationEmpl30 = (Employee e) -> e.age > 30;
+        EmployeeFilter organisationEmpl50 = (Employee e) -> e.salary >= 50;
+        EmployeeFilter organisationString = (Employee e) -> e.name.startsWith("А");
 
-    public DebitAccount(int amount, String currency) {
-        if (amount < 0) {
-            System.out.println("Баланс дебетового счета не может быть меньше 0");
-        } else {
-            this.amount = amount;
-            this.currency = currency;
-        }
-    }
 
-    @Override
-    public void withdrawCash(int amount) {
-        if (amount > this.amount) {
-            System.out.println("У вас недостаточно средств для снятия суммы " + amount + " " + currency);
-        } else {
-            this.amount -= amount;
-            System.out.println("Вы сняли " + amount + " " + currency);
-        }
-    }
+        System.out.println("Список сотрудников старше 30:");
+        organisation.printEmployees(organisationEmpl30);
 
-    @Override
-    public void showBalance() {
-        System.out.println("На вашем счету осталось " + amount + " " + currency);
+        System.out.println("Список сотрудников с зарплатой 50 и выше:");
+        // ваш код здесь
+        organisation.printEmployees(organisationEmpl50);
+
+        System.out.println("Список сотрудников с именем начинающимся на \"А\":");
+        // ваш код здесь
+        organisation.printEmployees(organisationString);
     }
 }
 
-class CreditAccount extends BankAccount {
+@FunctionalInterface
+interface EmployeeFilter {
+    boolean accept(Employee e);
+}
 
-    public int creditLimit;
+class Employee {
+    String name;
+    int age;
+    int salary;
 
-    public CreditAccount(int amount, String currency, int creditLimit) {
-        this.amount = amount;
-        this.currency = currency;
-        this.creditLimit = creditLimit;
+    Employee(String name, int age, int salary) {
+        this.name = name;
+        this.age = age;
+        this.salary = salary;
     }
 
     @Override
-    public void withdrawCash(int amount) {
-        if (this.amount - amount < -creditLimit) {
-            System.out.println("У вас недостаточно средств для снятия суммы " + amount + " " + currency);
-        } else {
-            this.amount -= amount;
-            System.out.println("Вы сняли " + amount + " " + currency);
-        }
-    }
-
-    @Override
-    public void showBalance() {
-        if (amount >= 0) {
-            System.out.println("На вашем счету " + amount + " " + currency);
-        } else {
-            System.out.println("Ваша задолженность по кредитному счету составялет " + Math.abs(amount) + currency);
-        }
+    public String toString() {
+        return name + ", возраст " + age + ", зарплата " + salary;
     }
 }
 
-class Bank {
+class Organisation {
+    private ArrayList<Employee> employeeList;
 
-    // создать метод createNewAccount, который принимает на вход строку с типом аккаунта и строку с создаваемой валютой
-    public BankAccount createNewAccount(String accountType, String currency) {
-        BankAccount bankAccount = new BankAccount();
-
-        switch (accountType) {
-            // если тип "debit_account"
-            case "debit_account":
-                // вывести сообщение "Ваш дебетовый счет создан"
-                System.out.println("Ваш дебетовый счет создан");
-                // создать дебетовый аккаунт в выбранной валюте и с нулевым балансом
-                BankAccount debtAcc = new DebitAccount(0, currency);
-                return debtAcc;
-            // если тип "credit_account"
-            case "credit_account":
-                // посчитать кредитный лимит в зависимости от валюты
-                int creditLimit = calculateCreditLimit(currency);
-                // вывести сообщение "Кредитный счет создан. Ваш лимит по счету {limit} {currency}"
-                System.out.println("Кредитный счет создан. Ваш лимит по счету " + creditLimit + " " + currency);
-                // создать кредитный аккаунт в выборанной валюты и с посчитанным кредитным лимитом
-                BankAccount creditAcc = new CreditAccount(bankAccount.amount, currency, creditLimit);
-                return creditAcc;
-            // иначе
-            default:
-                // вывести сообщение "Неверно указа тип создаваемого счета"
-                System.out.println("Неверно указа тип создаваемого счета");
-                // создать пустой объект BankAccount()
-                BankAccount emptyAcc = new BankAccount();
-                return emptyAcc;
-        }
+    Organisation() {
+        employeeList = new ArrayList<>();
+        employeeList.add( new Employee("Алина", 20, 33));
+        employeeList.add( new Employee("Иван", 41, 58));
+        employeeList.add( new Employee("Ольга", 30, 41));
+        employeeList.add( new Employee("Дмитрий", 23, 38));
+        employeeList.add( new Employee("Анастасия", 38, 50));
+        employeeList.add( new Employee("Максим", 31, 30));
+        employeeList.add( new Employee("Антон", 23, 33));
     }
 
-    // создать метод closeAccount, который принимает на вход переменную типа BankAccount
-    public void closeAccount(BankAccount bankAccount) {
-
-        // если переданный аккаунт дебетовый
-        if (bankAccount instanceof DebitAccount) {
-            if (bankAccount.amount == 0)
-                // если на счету нет денег вывести сообщение "Ваш дебетовый счет закрыт"
-                System.out.println("Ваш дебетовый счет закрыт");
-            else
-                // иначе вывести сообщение "Ваш дебетовый счет закрыт. Вы можете получить остаток по вашему счету в размере {amount} {currency} в отделении банка"
-                System.out.println("Ваш дебетовый счет закрыт. Вы можете получить остаток по вашему счету в размере " + ((DebitAccount) bankAccount).amount + " " + ((DebitAccount) bankAccount).currency + " в отделении банка");
-        } else if (bankAccount instanceof CreditAccount) {  // если переданный аккаунт кредитный
-            if (bankAccount.amount == 0) {
-                // если на счету нет денег вывести сообщение "Ваш кредитный счет закрыт"
-                System.out.println("Ваш кредитный счет закрыт");
-            } else if (bankAccount.amount > 0) {
-                // если на счету положительный баланс вывести сообщение "Ваш кредитный счет закрыт. Вы можете получить остаток по вашему счету в размере {amount} {currency} в отделении банка"
-                System.out.println("Ваш кредитный счет закрыт. Вы можете получить остаток по вашему счету в размере " + ((CreditAccount) bankAccount).amount + " " + ((CreditAccount) bankAccount).currency + " в отделении банка");
-            } else if (bankAccount.amount < 0) {
-                // если на счету отрицательный баланс вывести сообщение "Вы не можете закрыть кредитный счет потому как на нем еще есть задолженность. Ваша задолженность по счету составляет {amount} {currency}"
-                System.out.println("Вы не можете закрыть кредитный счет потому как на нем еще есть задолженность. Ваша задолженность по счету составляет " + ((CreditAccount) bankAccount).amount + " " + ((CreditAccount) bankAccount).currency);
+    void printEmployees(EmployeeFilter employeeFilter) {
+        for (Employee e: employeeList) {
+            if (employeeFilter.accept(e)) {
+                System.out.println(e);
             }
-        } else {
-            // иначе вывести сообщение "Пока что мы не можем закрыть данный вид счета"
-            System.out.println("Пока что мы не можем закрыть данный вид счета");
         }
+        System.out.println(); // печатаем пустую строку для улучшения читаемости
     }
-
-    private int calculateCreditLimit(String currency){
-        switch (currency){
-            case "RUB":
-                return 100000;
-            case "USD":
-                return 1250;
-            case "EUR":
-                return 1000;
-            default:
-                return 0;
-        }
-    }
-
-
 }
