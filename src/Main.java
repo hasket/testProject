@@ -6,26 +6,20 @@ public class Main {
         Organisation organisation = new Organisation();
 
         System.out.println("Список всех сотрудников:");
+
         // замените создание анонимного класса на лямбда-функцию
-        EmployeeFilter organizationPrint = (Employee e) -> true;
-
-        organisation.printEmployees(organizationPrint);
-
-        EmployeeFilter organisationEmpl30 = (Employee e) -> e.age > 30;
-        EmployeeFilter organisationEmpl50 = (Employee e) -> e.salary >= 50;
-        EmployeeFilter organisationString = (Employee e) -> e.name.startsWith("А");
-
+        organisation.printEmployees(e -> true);
 
         System.out.println("Список сотрудников старше 30:");
-        organisation.printEmployees(organisationEmpl30);
+        organisation.printEmployees(e -> e.age > 30);
 
         System.out.println("Список сотрудников с зарплатой 50 и выше:");
         // ваш код здесь
-        organisation.printEmployees(organisationEmpl50);
+        organisation.printEmployees(e -> e.salary > 50);
 
         System.out.println("Список сотрудников с именем начинающимся на \"А\":");
         // ваш код здесь
-        organisation.printEmployees(organisationString);
+        organisation.printEmployees(e -> e.name.startsWith("А"));
     }
 }
 
