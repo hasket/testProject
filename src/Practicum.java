@@ -22,7 +22,9 @@ class Pair<F, S> {
     }
 
     public static <T, E> Pair of(T type, E element){
-        Pair<T,E> pairs = new Pair<>(type, element); // <- сделал экземпляр класса
-        return pairs;
+        // Pair<T,E> pairs = new Pair<>(type, element); // <- сделал экземпляр класса
+        // return pairs;
+        // Второй способ решения задачи
+        return new Pair(type, element);
     }
 }
