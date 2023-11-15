@@ -1,23 +1,20 @@
-import java.util.ArrayList;
+class Pair<F, S> {
+    public F first;
+    public S second;
 
-class TrashCan<T> {
-    ArrayList<T> trash = new ArrayList<>();;
-    final int canCapacity = 20;
-
-    public void putTrash(T t) {
-        if (canIsFull()) {
-            System.out.println("Корзина заполнена!");
-        } else {
-            trash.add(t);
-        }
+    @Override
+    public String toString() {
+        return "Pair{" + first + " " + second + "}";
     }
+}
 
-    public boolean canIsFull() {
-        return trash.size() >= canCapacity ;
-    }
+// Создайте дженерик-класс Triple, наследник класса Pair, содержащий одну переменную обобщенного типа с именем triple.
 
-    public void emptyTrash() {
-        trash.clear();
-        System.out.println("Мусор уничтожен");
+class Triple<F,S,T> extends Pair<F,S> {
+    T triple;
+
+    @Override
+    public String toString() {
+        return "Triple{" + first + " " + second + " " + triple + "}";
     }
 }
